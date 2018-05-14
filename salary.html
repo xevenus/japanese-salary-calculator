@@ -1,0 +1,244 @@
+<html>
+<head>
+<script type="text/javascript" src="jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="salary.js"></script>
+</head>
+<body>
+<style>
+ul {
+	list-style-type: none;
+	align: center;
+}
+
+li {
+	display: block;
+  font-size: 20px;
+  line-height: 40px;
+	//width: 1400px;
+}
+
+th {
+	line-height: 40px;
+}
+
+th td {
+	font-size: 20px;
+	font-weight: bold;
+	text-align: center;
+}
+
+tr {
+	line-height: 40px;
+}
+
+td {
+	font-size: 20px;
+	padding: 5px;
+}
+
+div.amount_name {
+	display: inline-block;
+	width: 200px;
+	text-align: left;
+	font-weight: bold;
+}
+
+td.amount_name {
+	width: 220px;
+	text-align: left;
+	font-size: 18px;
+	font-weight: bold;
+	padding-left: 40px;
+}
+
+td.amount_input {
+	width: 150px;
+}
+
+/* 入力ボックス */
+input {
+	width: 150px;
+	font-size: 20px;
+	text-align: right;
+}
+
+div.amount_default {
+	display: inline-block;
+	width: 150px;
+	text-align: right;
+	font-weight: bold;
+}
+
+td.amount_price {
+	width: 150px;
+	text-align: right;
+	margin-right: 20px;
+}
+
+td.table-title {
+	text-align: center;
+	font-weight: bold;
+}
+
+
+div.amount_calc {
+	display: inline-block;
+	width: 200px;
+	text-align: right;
+	font-weight: bold;
+}
+
+table td {
+	border-bottom: 2px #000000 solid;
+	border-width: 1px;
+
+/*
+	border-collapse: separate;
+    border-spacing: 2px;
+    border-color: grey;
+    border-top-color: grey;
+    border-right-color: grey;
+    border-bottom-color: grey;
+    border-left-color: grey;
+*/
+}
+
+td.table-title-remarks {
+	width: 300px;
+	text-align: center;
+	font-weight: bold;
+}
+
+
+/* ボタン */
+input#exec_calc {
+	width: 200px;
+	height: 50px;
+	font-size: 20px;
+/*	background-color:  */
+}
+
+input#append_dependents {
+	width: 100px;
+	height: 30px;
+	font-size: 20px;
+}
+
+
+</style>
+<h1>給与計算シミュレーター</h1>
+<div id="input_box">
+<table>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="table-title">入力欄</td>
+    <td class="table-title-remarks">備考</td>
+  </tr>
+  <tr>
+    <td class="amount_name">基本給</td>
+    <td class="amount_price"><input type="text" name="basicSalaryInput" id="basicSalaryInput" value="" /></td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td class="amount_name">残業手当</td>
+    <td class="amount_price"><input type="text" name="overtimePaymentInput" id="overtimePaymentInput" value="" /></td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td class="amount_name">手当１</td>
+    <td class="amount_price"><input type="text" name="benefitInput1" id="benefitInput1" value="" /></td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td class="amount_name">手当２</td>
+    <td class="amount_price"><input type="text" name="benefitInput2" id="benefitInput2" value="" /></td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td class="amount_name">支給総額</td>
+    <td class="amount_price"><div class="amount_default" id="paymentAmount"></div></td>
+    <td class="remarks-row"><div class="remarks" id="payment_remarks"></div></td>
+  </tr>
+  <tr>
+    <td class="amount_name">厚生年金保険料</td>
+    <td class="amount_price"><div class="amount_default" id="socialSecurity"></div></td>
+    <td class="remarks-row"><div class="remarks" id="socialSecurityRemarks"></div></td>
+  </tr>
+  <tr>
+    <td class="amount_name">雇用保険料</td>
+    <td class="amount_price"><div class="amount_default" id="unemploymentInsurance"></div></td>
+    <td class="remarks-row"><div class="remarks" id="unemploymentInsuranceRemarks"></div></td>
+  </tr>
+  <tr>
+    <td class="amount_name">健康保険料</td>
+    <td class="amount_price"><div class="amount_default" id="healthInsurance"></div></td>
+    <td class="remarks-row"><div class="remarks" id="healthInsuranceRemarks"></div></td>
+  </tr>
+  <tr>
+    <td class="amount_name">年間賞与予定額</td>
+    <td class="amount_price"><input type="text" name="scheduled_bonus" id="scheduledBonus" value="0" /></td>
+    <td class="remarks-row"><div class="remarks" id="scheduledBsonusRemarks"></div></td>
+  </tr>
+  <tr>
+    <td class="amount_name">想定年間収入</td>
+    <td class="amount_price"><div class="amount_default" id="annualIncome"></div></td>
+    <td class="remarks-row"><div class="remarks" id="annualIncomeRemarks">社会保険料控除後</div></td>
+  </tr>
+  <tr>
+    <td class="amount_name">給与所得控除額</td>
+    <td class="amount_price"><div class="amount_default" id="salaryIncomeDeduction"></div></td>
+    <td class="remarks-row"><div class="remarks" id="salaryIncomeDeductionRemarks"></div></td>
+  </tr>
+  <tr>
+    <td class="amount_name">年間課税所得額</td>
+    <td class="amount_price"><div class="amount_default" id="annualTaxableIncome"></div></td>
+    <td class="remarks-row"><div class="remarks" id="annualTaxableIncomeRemarks"></div></td>
+  </tr>
+  <tr id="incrementable_0">
+    <td class="amount_name">一般の控除対象扶養親族</td>
+    <td class="amount_price"><input type="text" name="dependents1" id="dependents1" value="0" /></td>
+    <td class="remarks-row">その年12月31日現在の年齢が16歳以上</td>
+  </tr>
+  <tr id="incrementable_1">
+    <td class="amount_name">特定扶養親族</td>
+    <td class="amount_price"><input type="text" name="dependents2" id="dependents2" value="0" /></td>
+    <td class="remarks-row">その年12月31日現在の年齢が19歳以上23歳未満の人</td>
+  </tr>
+  <tr id="incrementable_2">
+    <td class="amount_name">老人扶養親族</td>
+    <td class="amount_price"><input type="text" name="dependents3" id="dependents3" value="0" /></td>
+    <td class="remarks-row">その年12月31日現在の年齢が70歳以上の人</td>
+  </tr>
+  <tr id="incrementable_3">
+    <td class="amount_name">同居老親等</td>
+    <td class="amount_price"><input type="text" name="dependents4" id="dependents4" value="0" /></td>
+    <td class="remarks-row">入院老親は同居老親、老人ホームは別居老親</td>
+  </tr>
+  <tr>
+    <td class="amount_name">課税所得標準額</td>
+    <td class="amount_price"><div class="amount_default" id="taxableIncome"></div></td>
+    <td class="remarks-row"><div class="remarks" id="taxableIncomeRemarks">月額</div></td>
+  </tr>
+  <tr>
+    <td class="amount_name">所得税</td>
+    <td class="amount_price"><div class="amount_default" id="incomeTax"></div></td>
+    <td class="remarks-row"><div class="remarks" id="incomeTaxRemarks"></div></td>
+  </tr>
+  <tr>
+    <td class="amount_name">住民税</td>
+    <td class="amount_price"><div class="amount_default" id="residentTax"></div></td>
+    <td class="remarks-row"><div class="remarks" id="residentTaxRemarks"></div></td>
+  </tr>
+  <tr>
+    <td class="amount_name">支払総額</td>
+    <td class="amount_price"><div class="amount_default" id="aftertaxIncome"></div></td>
+    <td class="remarks-row"><div class="remarks" id="aftertaxIncomeRemarks"></div></td>
+  </tr>
+</table>
+</div>
+
+<input type="button" id="exec_calc" value="計算実行">
+
+
+</body>
+</html>
