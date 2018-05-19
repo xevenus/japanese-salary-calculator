@@ -12,19 +12,41 @@
  *  GPLv3クイック・ガイド
  *  https://www.gnu.org/licenses/quick-guide-gplv3.html
  * 
- * Version 0.1 May 14, 2018
+ * 配偶者控除詳細計算未対応
  * 
+ * Version 0.2 May 19, 2018 基礎控除、計算漏れ修正、会社支払額表示追加
+ *
+ * Version 0.1 May 14, 2018 初回リリース
+ *
  *  XEVENUS LLC Copyright 2018
  */
 
 
 
 $(function() {
+	// 
 	var dependensRow = 0;
-	
+
+	// 基礎控除
+	var basicDeduction = 380000;
+
+	// 配偶者控除
+	var spouseDeduction = 0;
+
+	$('#basicDeduction').text(number_format(380000));
+
 	$('#append_dependents').click(function() {
 		insertTableRow($('#incrementable_' + dependensRow), (dependensRow + 1));
 		dependensRow++;
+	});
+	
+	$('#spouse').click(function() {
+		if ($('#spouse').is(':checked') == true) {
+			spouseDeduction = 380000;
+		} else {
+			spouseDeduction = 0;
+		}
+		$('#spouseDeduction').text(number_format(spouseDeduction));
 	});
 	
 	
@@ -50,7 +72,7 @@ $(function() {
 		var scheduledBonus = $('#scheduledBonus').val() == '' ? 0 : $('#scheduledBonus').val();
 		scheduledBonus = parseInt(scheduledBonus);
 
-		// 支給総額
+		// 支給総額（月額）
 		var paymentAmount = parseInt(basicSalaryInput + overtimePaymentInput + benefitInput1 + benefitInput2);
 		$('#paymentAmount').text(number_format(paymentAmount));
 
@@ -70,8 +92,18 @@ $(function() {
 		var healthInsurance = calcHealthInsurance(paymentAmount);
 		$('#healthInsurance').text(number_format(healthInsurance));
 
-		// 所得控除額計算
+		// 所得控除額計算（月額）
 		var incomeDeduction = socialSecurity + unemploymentInsurance + healthInsurance;
+
+		// 年間社会保険料合計
+		var annualSocialSecurity = incomeDeduction * 12;
+		$('#socialScurityTotal').text(number_format(annualSocialSecurity));
+
+		// 年間支給総額（人件費的な）
+		var monthlyPayment = parseInt(paymentAmount + socialSecurity + healthInsurance);
+		monthlyPayment += parseInt(unemploymentInsurance) * 2;
+		var annualCost = parseInt(monthlyPayment) * 12;
+		$('#annualCost').text(number_format(annualCost));
 
 		// 課税所得標準額（月額）
 		var taxableIncome = paymentAmount - incomeDeduction;
@@ -83,9 +115,8 @@ console.log('salaryIncomeDeduction = ' + salaryIncomeDeduction);
 		$('#salaryIncomeDeduction').text(number_format(salaryIncomeDeduction));
 
 		// 社会保険料控除後の給与所得控除額のマイナス = 年間課税所得額
-		annualTaxableIncome = parseInt(annualIncome - salaryIncomeDeduction);
+		annualTaxableIncome = parseInt(annualIncome - basicDeduction - salaryIncomeDeduction - annualSocialSecurity);
 // console.log('annualIncome = ' + annualIncome);
-		$('#annualTaxableIncome').text(number_format(annualTaxableIncome));
 
 		// 所得控除 -------------------------------
 		// 扶養控除
@@ -102,9 +133,12 @@ console.log('salaryIncomeDeduction = ' + salaryIncomeDeduction);
 		var dependentsDeduction = calcDependentsDeduction(dependents1, dependents2, dependents3, dependents4);
 console.log('dependentsDeduction = ' + dependentsDeduction);
 		
-		// 所得税計算前 課税所得額
+		// 所得税計算前 年間課税所得額
+		annualTaxableIncome -= spouseDeduction;
+console.log('spouseDeduction = ' + spouseDeduction);
 		annualTaxableIncome -= dependentsDeduction;
 console.log('annualTaxableIncome = ' + annualTaxableIncome);
+		$('#annualTaxableIncome').text(number_format(annualTaxableIncome));
 		
 		// 所得税
 		var annualIncomeTax = calcIncomeTax(annualTaxableIncome);
@@ -145,7 +179,7 @@ function calcSocailSecurity(paymentAmount)
 // 雇用保険料金額計算
 function calcUnemploymentInsurance(paymentAmount)
 {
-	var result = paymentAmount;
+	var result = parseInt(paymentAmount);
 
 	// Un enplayment Insurance is 3 / 1000
 	// refer the Health Labor Ministry
@@ -159,7 +193,7 @@ function calcUnemploymentInsurance(paymentAmount)
 //  地方自治体によって微妙に異なる
 function calcHealthInsurance(paymentAmount)
 {
-	var result = paymentAmount;
+	var result = parseInt(paymentAmount);
 
 	// TODO 
 	// Too many numbers in table
@@ -252,7 +286,7 @@ function calcResidentTax(taxable_income)
 function calcPublicMedicalInsurance(taxable_income, familyCount)
 {
 	// 保険料算定基準額
-	var standard = taxable_income - 330000;
+	var standard = parseInt(taxable_income) - 330000;
 
 	// 所得割保険料率
 	var medicalRate = parseFloat(6.86);       // 医療分
@@ -323,7 +357,6 @@ function calcDependentsDeduction(dependents1, dependents2, dependents3, dependen
 	// We need several input box for dependents birthday.
     //  
 	var dp = parseInt(dependents1) * 380000;
-console.log('dp = ' + dp);
 
 	dp += parseInt(dependents2) * 630000;
 	dp += parseInt(dependents3) * 480000;
@@ -333,17 +366,4 @@ console.log('dp = ' + dp);
 }
 
 
-// テーブルROW（行）追加
-function insertTableRow(idr, i)
-{
-	var rowData = $('<tr id="incrementable_' + i + '">');
-	rowData.append($('<td class="amount_name">扶養家族' + i + '</td>'));
-	rowData.append($('<td class="amount_price">'));
-	rowData.append($('<td class="remarks-row">'));
-	
-	// $('#incrementable_0').after($('<tr><td></td><td></td><td></td></tr>'));
-	idr.after(rowData);
-	
-	return rowData;
-}
 

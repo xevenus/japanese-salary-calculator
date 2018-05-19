@@ -124,6 +124,13 @@ input#append_dependents {
 	font-size: 20px;
 }
 
+input.check-box {
+	display: inline-block;
+}
+
+div#spouseDeduction {
+	display: inline-block;
+}
 
 </style>
 <h1>給与計算シミュレーター</h1>
@@ -180,9 +187,24 @@ input#append_dependents {
     <td class="remarks-row"><div class="remarks" id="scheduledBsonusRemarks"></div></td>
   </tr>
   <tr>
-    <td class="amount_name">想定年間収入</td>
+    <td class="amount_name">年間給与支払額</td>
+    <td class="amount_price"><div class="amount_default" id="annualCost"></div></td>
+    <td class="remarks-row"><div class="remarks" id="annualCostRemarks">会社支払分、人件費的な</div></td>
+  </tr>
+  <tr>
+    <td class="amount_name">年間給与受取額</td>
     <td class="amount_price"><div class="amount_default" id="annualIncome"></div></td>
-    <td class="remarks-row"><div class="remarks" id="annualIncomeRemarks">社会保険料控除後</div></td>
+    <td class="remarks-row"><div class="remarks" id="annualIncomeRemarks"></div></td>
+  </tr>
+  <tr>
+    <td class="amount_name">年間社会保険料合計額</td>
+    <td class="amount_price"><div class="amount_default" id="socialScurityTotal"></div></td>
+    <td class="remarks-row"><div class="remarks" id="socialScurityTotalRemarks"></div></td>
+  </tr>
+  <tr>
+    <td class="amount_name">基礎控除</td>
+    <td class="amount_price"><div class="amount_default" id="basicDeduction"></div></td>
+    <td class="remarks-row"><div class="remarks" id="basicDeductionRemarks"></div></td>
   </tr>
   <tr>
     <td class="amount_name">給与所得控除額</td>
@@ -190,9 +212,9 @@ input#append_dependents {
     <td class="remarks-row"><div class="remarks" id="salaryIncomeDeductionRemarks"></div></td>
   </tr>
   <tr>
-    <td class="amount_name">年間課税所得額</td>
-    <td class="amount_price"><div class="amount_default" id="annualTaxableIncome"></div></td>
-    <td class="remarks-row"><div class="remarks" id="annualTaxableIncomeRemarks"></div></td>
+    <td class="amount_name">配偶者控除額</td>
+    <td class="amount_price"><input class="check-box" type="checkbox" id="spouse" value=''><div class="amount_default" id="spouseDeduction"></div></td>
+    <td class="remarks-row"><div class="remarks" id="spouseDeductionRemarks"></div></td>
   </tr>
   <tr id="incrementable_0">
     <td class="amount_name">一般の控除対象扶養親族</td>
@@ -213,6 +235,11 @@ input#append_dependents {
     <td class="amount_name">同居老親等</td>
     <td class="amount_price"><input type="text" name="dependents4" id="dependents4" value="0" /></td>
     <td class="remarks-row">入院老親は同居老親、老人ホームは別居老親</td>
+  </tr>
+  <tr>
+    <td class="amount_name">年間課税所得額</td>
+    <td class="amount_price"><div class="amount_default" id="annualTaxableIncome"></div></td>
+    <td class="remarks-row"><div class="remarks" id="annualTaxableIncomeRemarks">控除後</div></td>
   </tr>
   <tr>
     <td class="amount_name">課税所得標準額</td>
